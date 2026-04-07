@@ -2,7 +2,7 @@
 # Target execution environment: Microsoft Fabric Spark Notebook
 
 from pyspark.sql import SparkSession
-from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType
+from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType, BooleanType
 import random
 import uuid
 
@@ -79,6 +79,12 @@ projects_schema = StructType([
 df_projects = spark.createDataFrame(projects_data, schema=projects_schema)
 
 # Generate Tasks
+TASK_DESCRIPTIONS = {
+    'Mechanical': ['Install HVAC system', 'Ductwork route installation', 'HVAC unit maintenance', 'Ventilation setup'],
+    'Electrical': ['Wire basic circuits', 'Install main breaker panel', 'Run conduit', 'Install light fixtures', 'Electrical safety inspection'],
+    'Plumbing':  ['Install main water line', 'Connect drainage pipes', 'Install bathroom fixtures', 'Water pressure testing']
+}
+
 tasks_data = []
 for proj in projects_data:
     proj_id = proj[0]
@@ -86,17 +92,39 @@ for proj in projects_data:
     for _ in range(num_tasks):
         task_id = str(uuid.uuid4())[:8]
         req_skill = random.choice(TRADES)
-        man_hours_est = round(random.uniform(10.0, 200.0), 1)
+        task_desc = random.choice(TASK_DESCRIPTIONS[req_skill]) + f" (Phase {random.randint(1, 3)})"
         min_staff = random.randint(1, 4)
         
-        tasks_data.append((task_id, proj_id, req_skill, man_hours_est, min_staff))
+        # New advanced constraints
+        setup_teardown_mins = random.choice([15, 30, 45, 60])
+        is_interruptible = random.choice([True, True, True, False]) # 25% chance of being uninterruptible
+        block_requirement = random.choice(["Any", "Any", "Half-Day", "Full-Day"])
+        
+        # Adjust man_hours safely based on constraint realities
+        if not is_interruptible:
+            # If it must be completed in a single day, it functionally cannot exceed (8 hours * min_staff)
+            max_daily_allowed = min_staff * 8.0
+            man_hours_est = round(random.uniform(2.0, max_daily_allowed), 1)
+        else:
+            man_hours_est = round(random.uniform(10.0, 100.0), 1)
+            
+        if block_requirement == "Half-Day" and man_hours_est < 4.0:
+            man_hours_est = 4.0
+        if block_requirement == "Full-Day" and man_hours_est < 8.0:
+            man_hours_est = 8.0
+        
+        tasks_data.append((task_id, proj_id, req_skill, task_desc, man_hours_est, min_staff, setup_teardown_mins, is_interruptible, block_requirement))
 
 tasks_schema = StructType([
     StructField("task_id", StringType(), False),
     StructField("project_id", StringType(), False),
     StructField("required_skill", StringType(), False),
+    StructField("task_desc", StringType(), False),
     StructField("man_hours_est", DoubleType(), False),
-    StructField("min_staff", IntegerType(), False)
+    StructField("min_staff", IntegerType(), False),
+    StructField("setup_teardown_mins", IntegerType(), False),
+    StructField("is_interruptible", BooleanType(), False),
+    StructField("block_requirement", StringType(), False)
 ])
 df_tasks = spark.createDataFrame(tasks_data, schema=tasks_schema)
 
@@ -128,10 +156,10 @@ print("Saving Tables to Delta Lake...")
 # Here we're saving them as managed tables in the default attached Lakehouse.
 
 try:
-    df_employees.write.format("delta").mode("overwrite").saveAsTable("Employees")
-    df_projects.write.format("delta").mode("overwrite").saveAsTable("Projects")
-    df_tasks.write.format("delta").mode("overwrite").saveAsTable("Tasks")
-    df_constraints.write.format("delta").mode("overwrite").saveAsTable("Constraints_Rules")
+    df_employees.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("Employees")
+    df_projects.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("Projects")
+    df_tasks.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("Tasks")
+    df_constraints.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("Constraints_Rules")
     print("Successfully saved all Delta tables.")
 except Exception as e:
     print("Encountered an error while saving to Delta tables. Ensure a Lakehouse is attached.")
