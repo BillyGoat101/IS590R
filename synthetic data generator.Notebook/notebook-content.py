@@ -14,6 +14,9 @@
 # META       "known_lakehouses": [
 # META         {
 # META           "id": "da9cf26c-4c48-461f-959e-74208f7b9161"
+# META         },
+# META         {
+# META           "id": "1586ed29-f85b-413a-90ff-3f8970271a05"
 # META         }
 # META       ]
 # META     }
@@ -29,7 +32,6 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType, BooleanType
 import random
 import uuid
-import random
 
 # Initialize Spark Session (In Fabric notebooks, 'spark' is usually provided by default, 
 # but it's good practice to getOrCreate)
@@ -77,14 +79,17 @@ last_names = [
     "Wadsworth", "Walker", "Warner", "Webb", "Whitaker", "Wilcox", "Winder", "Wood", "Wright", "Young"
 ]
 employees_data = []
-for i in range(1, 30):
-    emp_id = f"EMP{i:03d}"
+# Using an index up to 30 guarantees exactly 10 per trade, and exactly 3, 3, 4 distribution of skills within each
+for i in range(30):
+    emp_id = f"EMP{i+1:03d}"
     first_name = random.choice(first_names)
     first_names.remove(first_name)
     last_name = random.choice(last_names)
     last_names.remove(last_name)
-    trade = random.choice(TRADES)
-    skill_level = random.choice(SKILL_LEVELS)
+    
+    # Mathematical distribution guarantees perfect proportions across the company
+    trade = TRADES[i % len(TRADES)]
+    skill_level = SKILL_LEVELS[(i // len(TRADES)) % len(SKILL_LEVELS)]
     
     # Generate home locations within Utah County
     home_lat = round(random.uniform(LAT_MIN, LAT_MAX), 5)
@@ -156,9 +161,9 @@ df_projects = spark.createDataFrame(projects_data, schema=projects_schema)
 
 # Generate Tasks
 TASK_DESCRIPTIONS = {
-    'Mechanical': ['Install HVAC system', 'Ductwork route installation', 'HVAC unit maintenance', 'Ventilation setup'],
-    'Electrical': ['Wire basic circuits', 'Install main breaker panel', 'Run conduit', 'Install light fixtures', 'Electrical safety inspection'],
-    'Plumbing':  ['Install main water line', 'Connect drainage pipes', 'Install bathroom fixtures', 'Water pressure testing']
+    'Mechanical': ['Install HVAC system', 'Ductwork route installation', 'HVAC unit maintenance', 'Ventilation setup', 'Gas Piping', 'Final Connections'],
+    'Electrical': ['Wire basic circuits', 'Install main breaker panel', 'Run conduit', 'Install light fixtures', 'Electrical safety inspection', 'Final Connections'],
+    'Plumbing':  ['Install main water line', 'Connect drainage pipes', 'Install bathroom fixtures', 'Water pressure testing', 'Gas Piping', 'Final Connections']
 }
 
 tasks_data = []
@@ -177,19 +182,26 @@ for proj in projects_data:
         block_requirement = random.choice(["Any", "Any", "Half-Day", "Full-Day"])
         
         # Adjust man_hours safely based on constraint realities
-        if not is_interruptible:
-            # If it must be completed in a single day, it functionally cannot exceed (8 hours * min_staff)
-            max_daily_allowed = min_staff * 8.0
-            man_hours_est = round(random.uniform(2.0, max_daily_allowed), 1)
+        if block_requirement == "Half-Day":
+            man_hours_est = round(random.uniform(4.0 * min_staff, 8.0 * min_staff), 1)
+        elif block_requirement == "Full-Day":
+            man_hours_est = round(random.uniform(8.0 * min_staff, 16.0 * min_staff), 1)
         else:
-            man_hours_est = round(random.uniform(10.0, 100.0), 1)
+            man_hours_est = round(random.uniform(4.0, 60.0), 1)
             
-        if block_requirement == "Half-Day" and man_hours_est < 4.0:
-            man_hours_est = 4.0
-        if block_requirement == "Full-Day" and man_hours_est < 8.0:
-            man_hours_est = 8.0
+        if not is_interruptible:
+            # If it must be completed in a single day, it functionally cannot exceed (8 hours * MAX realistic staff)
+            # To ensure it's easily solvable by the AI, we'll bound it strictly.
+            max_daily_allowed = min_staff * 8.0
+            man_hours_est = min(man_hours_est, max_daily_allowed)
+            
+        # Add realistic task statuses
+        # We heavily weight "Backlog" to simulate multi-year project pipelines
+        status_pool = ['Backlog', 'Ready', 'In Progress', 'Blocked', 'Completed']
+        status_weights = [0.60, 0.20, 0.10, 0.05, 0.05]
+        task_status = random.choices(status_pool, weights=status_weights, k=1)[0]
         
-        tasks_data.append((task_id, proj_id, req_skill, task_desc, man_hours_est, min_staff, setup_teardown_mins, is_interruptible, block_requirement))
+        tasks_data.append((task_id, proj_id, req_skill, task_desc, man_hours_est, min_staff, setup_teardown_mins, is_interruptible, block_requirement, task_status))
 
 tasks_schema = StructType([
     StructField("task_id", StringType(), False),
@@ -200,13 +212,16 @@ tasks_schema = StructType([
     StructField("min_staff", IntegerType(), False),
     StructField("setup_teardown_mins", IntegerType(), False),
     StructField("is_interruptible", BooleanType(), False),
-    StructField("block_requirement", StringType(), False)
+    StructField("block_requirement", StringType(), False),
+    StructField("task_status", StringType(), False)
 ])
 df_tasks = spark.createDataFrame(tasks_data, schema=tasks_schema)
 
 # Define Constraints_Rules
 constraints_data = [
-    ("Hard", "Max ratio of Apprentice to Journeyman on any task or trade operation is 1:1"),
+    ("Hard", "Electrical max ratio of Apprentice to Journeyman on any task is 1:1"),
+    ("Hard", "Plumbing max ratio of Apprentice to Journeyman on any task is 1:2"),
+    ("Hard", "Mechanical max ratio of Apprentice to Journeyman on any task is 1:3"),
     ("Hard", "Every physical job site task must have at least one Journeyman present"),
     ("Hard", "Technicians cannot be double-booked on overlapping schedules"),
     ("Hard", "Technician assigned trade must match the task required skill trade"),
