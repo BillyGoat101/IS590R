@@ -1,0 +1,97 @@
+table tasks
+	lineageTag: 6d83a662-fd9c-41ec-b25b-50871382aac5
+	sourceLineageTag: [dbo].[tasks]
+
+	column task_id
+		dataType: string
+		lineageTag: a7bed014-854b-4b9e-89cd-06f54a1a4573
+		sourceLineageTag: task_id
+		summarizeBy: none
+		sourceColumn: task_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column project_id
+		dataType: string
+		lineageTag: 845f4710-4980-4142-9061-632f86dca046
+		sourceLineageTag: project_id
+		summarizeBy: none
+		sourceColumn: project_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column required_skill
+		dataType: string
+		lineageTag: 3b0ef752-0deb-4bb5-96b9-b20857cc8824
+		sourceLineageTag: required_skill
+		summarizeBy: none
+		sourceColumn: required_skill
+
+		annotation SummarizationSetBy = Automatic
+
+	column task_desc
+		dataType: string
+		lineageTag: 837f6022-80e4-4903-87f8-16fdfe8b6028
+		sourceLineageTag: task_desc
+		summarizeBy: none
+		sourceColumn: task_desc
+
+		annotation SummarizationSetBy = Automatic
+
+	column man_hours_est
+		dataType: double
+		lineageTag: d50258ea-b09b-4e6d-8d9e-3a42543e812e
+		sourceLineageTag: man_hours_est
+		summarizeBy: sum
+		sourceColumn: man_hours_est
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column min_staff
+		dataType: int64
+		formatString: 0
+		lineageTag: 51ad2072-feac-4675-a225-c6f78a48d4af
+		sourceLineageTag: min_staff
+		summarizeBy: sum
+		sourceColumn: min_staff
+
+		annotation SummarizationSetBy = Automatic
+
+	column setup_teardown_mins
+		dataType: int64
+		formatString: 0
+		lineageTag: 0a51f55a-28d9-485e-8c50-3272a73cb90b
+		sourceLineageTag: setup_teardown_mins
+		summarizeBy: sum
+		sourceColumn: setup_teardown_mins
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_interruptible
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2b338d3d-e5b0-49f8-9198-24b3b3cbca43
+		sourceLineageTag: is_interruptible
+		summarizeBy: none
+		sourceColumn: is_interruptible
+
+		annotation SummarizationSetBy = Automatic
+
+	column block_requirement
+		dataType: string
+		lineageTag: f5b7b8a9-8877-4989-9927-292da82911b2
+		sourceLineageTag: block_requirement
+		summarizeBy: none
+		sourceColumn: block_requirement
+
+		annotation SummarizationSetBy = Automatic
+
+	partition tasks = entity
+		mode: directLake
+		source
+			entityName: tasks
+			schemaName: dbo
+			expressionSource: 'DirectLake - Data'
+

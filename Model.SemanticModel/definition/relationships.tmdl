@@ -1,0 +1,12 @@
+relationship e55297d0-78e7-2dc0-ed76-eabaafcdad65
+	fromColumn: tasks.project_id
+	toColumn: projects.project_id
+
+relationship 70ae5ab6-dc67-1e51-3bdf-d9f726987a7e
+	fromColumn: schedule_output.task_id
+	toColumn: tasks.task_id
+
+relationship 35d7e3eb-dfd9-47ed-41e9-d6b9fb79e245
+	fromColumn: schedule_output.employee_id
+	toColumn: employees.employee_id
+

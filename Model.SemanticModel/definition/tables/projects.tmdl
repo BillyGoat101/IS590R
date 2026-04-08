@@ -1,0 +1,62 @@
+table projects
+	lineageTag: 69422927-5f9a-40a0-89ae-8256c15534f9
+	sourceLineageTag: [dbo].[projects]
+
+	column project_id
+		dataType: string
+		lineageTag: 609b6cf7-24a3-4470-8764-5e835a1ec4d2
+		sourceLineageTag: project_id
+		summarizeBy: none
+		sourceColumn: project_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column project_name
+		dataType: string
+		lineageTag: 441c924b-215f-4498-bf4a-e329c5bdabc2
+		sourceLineageTag: project_name
+		summarizeBy: none
+		sourceColumn: project_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column site_lat
+		dataType: double
+		lineageTag: 0304e872-f777-4d24-802a-6af18eddd9c9
+		sourceLineageTag: site_lat
+		summarizeBy: none
+		sourceColumn: site_lat
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column site_long
+		dataType: double
+		lineageTag: aaa04356-c493-4ae2-8049-0aa6ce81d754
+		sourceLineageTag: site_long
+		summarizeBy: none
+		sourceColumn: site_long
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column total_budget
+		dataType: double
+		lineageTag: c70d0b2e-8e58-4b39-a1dc-3e6a65433b16
+		sourceLineageTag: total_budget
+		summarizeBy: none
+		sourceColumn: total_budget
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition projects = entity
+		mode: directLake
+		source
+			entityName: projects
+			schemaName: dbo
+			expressionSource: 'DirectLake - Data'
+

@@ -1,0 +1,89 @@
+table employees
+	lineageTag: 70669f21-1d99-45dc-bcb9-fb55df423c0d
+	sourceLineageTag: [dbo].[employees]
+
+	column employee_id
+		dataType: string
+		lineageTag: ee8b8010-07b3-4ce7-ac5c-939c288fe740
+		sourceLineageTag: employee_id
+		summarizeBy: none
+		sourceColumn: employee_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_name
+		dataType: string
+		lineageTag: 77e40ee0-fae5-4467-a1d8-fc77925f0ffa
+		sourceLineageTag: first_name
+		summarizeBy: none
+		sourceColumn: first_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column last_name
+		dataType: string
+		lineageTag: be3218e5-2b97-4067-9af8-4612351d82ed
+		sourceLineageTag: last_name
+		summarizeBy: none
+		sourceColumn: last_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column trade
+		dataType: string
+		lineageTag: d26f292e-a843-41db-85c3-73933aec4b3d
+		sourceLineageTag: trade
+		summarizeBy: none
+		sourceColumn: trade
+
+		annotation SummarizationSetBy = Automatic
+
+	column skill_level
+		dataType: string
+		lineageTag: 9aa6dc78-ecc2-446e-92d1-5a5e171a8517
+		sourceLineageTag: skill_level
+		summarizeBy: none
+		sourceColumn: skill_level
+
+		annotation SummarizationSetBy = Automatic
+
+	column home_lat
+		dataType: double
+		lineageTag: 2ed7dd87-519a-4011-b372-b9a3c3d0f019
+		sourceLineageTag: home_lat
+		summarizeBy: none
+		sourceColumn: home_lat
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column home_long
+		dataType: double
+		lineageTag: ce3f805f-fbd9-4383-bcc0-9a1a26e4260a
+		sourceLineageTag: home_long
+		summarizeBy: none
+		sourceColumn: home_long
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column hourly_rate
+		dataType: double
+		lineageTag: de06b44b-162b-4e7f-ab7f-496a82e7e3a4
+		sourceLineageTag: hourly_rate
+		summarizeBy: none
+		sourceColumn: hourly_rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition employees = entity
+		mode: directLake
+		source
+			entityName: employees
+			schemaName: dbo
+			expressionSource: 'DirectLake - Data'
+

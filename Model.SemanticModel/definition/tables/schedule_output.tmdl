@@ -1,0 +1,107 @@
+table schedule_output
+	lineageTag: dfe104cb-3afb-406c-a55b-f0560bad970e
+	sourceLineageTag: [dbo].[schedule_output]
+
+	column employee_id
+		dataType: string
+		lineageTag: a210757b-202c-48c3-8a44-e57b68fc720a
+		sourceLineageTag: employee_id
+		summarizeBy: none
+		sourceColumn: employee_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column task_id
+		dataType: string
+		lineageTag: 3a3108cc-4360-4b8f-af1c-a22c0da2b91f
+		sourceLineageTag: task_id
+		summarizeBy: none
+		sourceColumn: task_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_index
+		dataType: int64
+		formatString: 0
+		lineageTag: 6bbe3215-3e43-47eb-84df-82408331bd49
+		sourceLineageTag: day_index
+		summarizeBy: sum
+		sourceColumn: day_index
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_name
+		dataType: string
+		lineageTag: 7ac0f49d-2b8e-493a-9556-b403a4193851
+		sourceLineageTag: day_name
+		summarizeBy: none
+		sourceColumn: day_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column start_time
+		dataType: string
+		lineageTag: efdde5b8-a3d3-452d-a547-2e1bce59ba4d
+		sourceLineageTag: start_time
+		summarizeBy: none
+		sourceColumn: start_time
+
+		annotation SummarizationSetBy = Automatic
+
+	column end_time
+		dataType: string
+		lineageTag: 1f390566-fd0b-42a2-9c98-905c91b8a235
+		sourceLineageTag: end_time
+		summarizeBy: none
+		sourceColumn: end_time
+
+		annotation SummarizationSetBy = Automatic
+
+	column duration_hours
+		dataType: double
+		lineageTag: 9ff7f7ee-ba39-4eec-b869-bc45c7ee6bb1
+		sourceLineageTag: duration_hours
+		summarizeBy: sum
+		sourceColumn: duration_hours
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column setup_teardown_mins_incurred
+		dataType: int64
+		formatString: 0
+		lineageTag: c674fafc-4553-4e2f-8da4-cae0cc9b0b4d
+		sourceLineageTag: setup_teardown_mins_incurred
+		summarizeBy: sum
+		sourceColumn: setup_teardown_mins_incurred
+
+		annotation SummarizationSetBy = Automatic
+
+	column actual_start_time
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 72fdbe4e-61fb-43b6-ba9e-a492d7aca269
+		sourceLineageTag: actual_start_time
+		summarizeBy: none
+		sourceColumn: actual_start_time
+
+		annotation SummarizationSetBy = Automatic
+
+	column actual_end_time
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 01672ea2-d0de-4312-bde3-e13d333fd486
+		sourceLineageTag: actual_end_time
+		summarizeBy: none
+		sourceColumn: actual_end_time
+
+		annotation SummarizationSetBy = Automatic
+
+	partition schedule_output = entity
+		mode: directLake
+		source
+			entityName: schedule_output
+			schemaName: dbo
+			expressionSource: 'DirectLake - Data'
+

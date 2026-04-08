@@ -1,11 +1,11 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
   "metadata": {
-    "type": "Lakehouse",
-    "displayName": "Data"
+    "type": "Notebook",
+    "displayName": "scheduler algorithm"
   },
   "config": {
     "version": "2.0",
-    "logicalId": "8f7b9161-7420-959e-461f-4c48da9cf26c"
+    "logicalId": "4e35c34f-e330-a533-4881-5dc0690f0b57"
   }
 }

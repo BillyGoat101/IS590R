@@ -1,0 +1,29 @@
+table constraints_rules
+	lineageTag: 7bc6bad7-df00-474d-b104-ef1967f1f2b1
+	sourceLineageTag: [dbo].[constraints_rules]
+
+	column rule_type
+		dataType: string
+		lineageTag: 0f745395-1de1-4e0d-9a75-0b65b96d9cd9
+		sourceLineageTag: rule_type
+		summarizeBy: none
+		sourceColumn: rule_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column logic_desc
+		dataType: string
+		lineageTag: 1ac0252b-3985-44d6-92bd-c2371c059444
+		sourceLineageTag: logic_desc
+		summarizeBy: none
+		sourceColumn: logic_desc
+
+		annotation SummarizationSetBy = Automatic
+
+	partition constraints_rules = entity
+		mode: directLake
+		source
+			entityName: constraints_rules
+			schemaName: dbo
+			expressionSource: 'DirectLake - Data'
+
